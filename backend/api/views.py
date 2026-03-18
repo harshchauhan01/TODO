@@ -1,9 +1,13 @@
-from django.shortcuts import render
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from django.http import JsonResponse
-from .models import Task
 import json
+from .models import Task
+from .serializers import *
+from django.shortcuts import render
+from django.http import JsonResponse
+from rest_framework import filters
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework.viewsets import ModelViewSet
 
 @api_view(['Get'])
 def home(request):
@@ -18,17 +22,16 @@ def users(request):
     ]
     return Response(data)
 
-def create_todo(request):
-    if request.method=="POST":
-        data=json.loads(request.body)
-        todo = Task.objects.create(
-            title=data.get('title'),
-            content=data.get('content'),
-            priority=data.get('priority'),
-            due_date=data.get('due_date'),
-        )
-        return JsonResponse({
-            "message":"Todo created successfully",
-            "id":todo.id
-        })
-    return JsonResponse({"error":"POST request required"})
+
+class TodoViewSet(ModelViewSet):
+    queryset=Task.objects.all()
+    serializer_class=TodoSerializer
+    filter_backends=[filters.SearchFilter]
+    search_fields=['title']
+
+    @action(detail=True,methods=["post"])
+    def mark_complete(self,request,pk=None):
+        todo=self.get_object()
+        todo.completed=True()
+        todo.save()
+        return Response({"status":"completed"})
