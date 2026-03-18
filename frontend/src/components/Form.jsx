@@ -1,9 +1,73 @@
-import React, { useEffect } from 'react';
+import axios from 'axios';
+import React, { useState } from 'react';
 
-const CustomForm = () => {
+const CustomForm = ({ onSuccess, onCancel }) => {
     
+    const [formData,setFormData]=useState({
+        title:"",
+        priority:"",
+        due_date:"",
+        completed:false,
+        content:""
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState("");
+
+    const handleChange=(e)=>{
+        const {name,value,type,checked}=e.target;
+        setFormData({
+            ...formData,
+            [name]: type === "checkbox" ? checked : value
+        });
+    }
+
+    const handleSubmit=async (e)=>{
+        e.preventDefault();
+        try{
+            setIsSubmitting(true);
+            setSubmitError("");
+
+            const payload = {
+                title: formData.title.trim(),
+                content: formData.content.trim(),
+                completed: formData.completed,
+                priority: formData.priority === "" ? 1 : Number(formData.priority),
+                due_date: formData.due_date
+                    ? new Date(`${formData.due_date}T00:00:00`).toISOString()
+                    : null,
+            };
+
+            await axios.post("http://127.0.0.1:8000/api/todo/",payload);
+
+            setFormData({
+                title: "",
+                priority: "",
+                due_date: "",
+                completed: false,
+                content: ""
+            });
+
+            if (onSuccess) {
+                onSuccess();
+            }
+        }catch(err){
+            const responseError = err?.response?.data;
+            if (typeof responseError === "string") {
+                setSubmitError(responseError);
+            } else if (responseError && typeof responseError === "object") {
+                const firstMessage = Object.values(responseError).flat()[0];
+                setSubmitError(firstMessage || "Failed to save task.");
+            } else {
+                setSubmitError("Failed to save task.");
+            }
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
+
+
     return (
-        <div className="bg-white p-10 rounded-lg shadow-lg">
+        <div  className="bg-white p-10 rounded-lg shadow-lg">
         <div className="flex flex-wrap gap-5 items-center w-full max-md:max-w-full mb-10">
             <div className="flex flex-wrap flex-1 shrink gap-5 items-center self-stretch my-auto basis-0 min-w-[240px] max-md:max-w-full">
             <div className="flex relative flex-col justify-center self-stretch bg-gray-100 h-[70px] min-h-[70px] rounded-[16px] overflow-hidden w-[70px]">
@@ -55,45 +119,56 @@ const CustomForm = () => {
             </div>
             </div>
         </div>
-        <div className="grid grid-cols-2 gap-6 mb-10">
+        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6 mb-10">
             <div id="input" className="relative">
-            <input type="text" id="floating_outlined" className="block w-full text-sm h-[50px] px-4 text-slate-900 bg-white rounded-[8px] border border-violet-200 appearance-none focus:border-transparent focus:outline focus:outline-2 focus:outline-primary focus:ring-0 hover:border-brand-500-secondary- peer invalid:border-error-500 invalid:focus:border-error-500 overflow-ellipsis overflow-hidden text-nowrap pr-[48px]" placeholder="Task Title" />
+            <input type="text" id="floating_outlined" className="block w-full text-sm h-[50px] px-4 text-slate-900 bg-white rounded-[8px] border border-violet-200 appearance-none focus:border-transparent focus:outline focus:outline-2 focus:outline-primary focus:ring-0 hover:border-brand-500-secondary- peer invalid:border-error-500 invalid:focus:border-error-500 overflow-ellipsis overflow-hidden text-nowrap pr-[48px]" placeholder="Task Title" 
+            name="title" value={formData.title} onChange={handleChange} required/>
             <label htmlFor="floating_outlined" className="peer-placeholder-shown:-z-10 peer-focus:z-10 absolute text-[14px] leading-[150%] text-primary peer-focus:text-primary peer-invalid:text-error-500 focus:invalid:text-error-500 duration-300 transform -translate-y-[1.2rem] scale-75 top-2 z-10 origin-[0] bg-white disabled:bg-gray-50-background- px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-[1.2rem] rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">
                 Task Title
             </label>
             </div>
             <div id="input" className="relative">
-            <input type="text" id="floating_outlined" className="block w-full text-sm h-[50px] px-4 text-slate-900 bg-white rounded-[8px] border border-violet-200 appearance-none focus:border-transparent focus:outline focus:outline-2 focus:outline-primary focus:ring-0 hover:border-brand-500-secondary- peer invalid:border-error-500 invalid:focus:border-error-500 overflow-ellipsis overflow-hidden text-nowrap pr-[48px]" placeholder="Priority" />
+            <input type="number" min="1" id="floating_outlined" className="block w-full text-sm h-[50px] px-4 text-slate-900 bg-white rounded-[8px] border border-violet-200 appearance-none focus:border-transparent focus:outline focus:outline-2 focus:outline-primary focus:ring-0 hover:border-brand-500-secondary- peer invalid:border-error-500 invalid:focus:border-error-500 overflow-ellipsis overflow-hidden text-nowrap pr-[48px]" placeholder="Priority" name="priority" value={formData.priority} onChange={handleChange}/>
             <label htmlFor="floating_outlined" className="peer-placeholder-shown:-z-10 peer-focus:z-10 absolute text-[14px] leading-[150%] text-primary peer-focus:text-primary peer-invalid:text-error-500 focus:invalid:text-error-500 duration-300 transform -translate-y-[1.2rem] scale-75 top-2 z-10 origin-[0] bg-white disabled:bg-gray-50-background- px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-[1.2rem] rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">
                 Priority
             </label>
             </div>
             <div id="input" className="relative">
-            <input type="date" id="floating_outlined" className="block w-full text-sm h-[50px] px-4 text-slate-900 bg-white rounded-[8px] border border-violet-200 appearance-none focus:border-transparent focus:outline focus:outline-2 focus:outline-primary focus:ring-0 hover:border-brand-500-secondary- peer invalid:border-error-500 invalid:focus:border-error-500 overflow-ellipsis overflow-hidden text-nowrap pr-[48px]" placeholder="Due Date"/>
+            <input type="date" id="floating_outlined" className="block w-full text-sm h-[50px] px-4 text-slate-900 bg-white rounded-[8px] border border-violet-200 appearance-none focus:border-transparent focus:outline focus:outline-2 focus:outline-primary focus:ring-0 hover:border-brand-500-secondary- peer invalid:border-error-500 invalid:focus:border-error-500 overflow-ellipsis overflow-hidden text-nowrap pr-[48px]" placeholder="Due Date" name="due_date" value={formData.due_date} onChange={handleChange}/>
             <label htmlFor="floating_outlined" className="peer-placeholder-shown:-z-10 peer-focus:z-10 absolute text-[14px] leading-[150%] text-primary peer-focus:text-primary peer-invalid:text-error-500 focus:invalid:text-error-500 duration-300 transform -translate-y-[1.2rem] scale-75 top-2 z-10 origin-[0] bg-white disabled:bg-gray-50-background- px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-[1.2rem] rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">
                 Due Date
             </label>
             </div>
             <div id="input" className="relative">
-            <input type="text" id="floating_outlined" className="block w-full text-sm h-[50px] px-4 text-slate-900 bg-white rounded-[8px] border border-violet-200 appearance-none focus:border-transparent focus:outline focus:outline-2 focus:outline-primary focus:ring-0 hover:border-brand-500-secondary- peer invalid:border-error-500 invalid:focus:border-error-500 overflow-ellipsis overflow-hidden text-nowrap pr-[48px]" placeholder="Completed" />
+            <input type="checkbox" id="floating_outlined" className="block w-full text-sm h-[50px] px-4 text-slate-900 bg-white rounded-[8px] border border-violet-200 appearance-none focus:border-transparent focus:outline focus:outline-2 focus:outline-primary focus:ring-0 hover:border-brand-500-secondary- peer invalid:border-error-500 invalid:focus:border-error-500 overflow-ellipsis overflow-hidden text-nowrap pr-[48px]" placeholder="Completed" name="completed" checked={formData.completed} onChange={handleChange}/>
             <label htmlFor="floating_outlined" className="peer-placeholder-shown:-z-10 peer-focus:z-10 absolute text-[14px] leading-[150%] text-primary peer-focus:text-primary peer-invalid:text-error-500 focus:invalid:text-error-500 duration-300 transform -translate-y-[1.2rem] scale-75 top-2 z-10 origin-[0] bg-white disabled:bg-gray-50-background- px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-[1.2rem] rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">
                 Completed
             </label>
             </div>
             <div id="input" className="relative col-span-2">
-            <textarea id="floating_description" className="block w-full text-sm min-h-[120px] px-4 pt-4 text-slate-900 bg-white rounded-[8px] border border-violet-200 appearance-none focus:border-transparent focus:outline focus:outline-2 focus:outline-primary focus:ring-0 hover:border-brand-500-secondary- peer invalid:border-error-500 invalid:focus:border-error-500 pr-4" placeholder="Description"></textarea>
+            <textarea id="floating_description" className="block w-full text-sm min-h-[120px] px-4 pt-4 text-slate-900 bg-white rounded-[8px] border border-violet-200 appearance-none focus:border-transparent focus:outline focus:outline-2 focus:outline-primary focus:ring-0 hover:border-brand-500-secondary- peer invalid:border-error-500 invalid:focus:border-error-500 pr-4" placeholder="Description" name="content" value={formData.content} onChange={handleChange} required></textarea>
             <label htmlFor="floating_description" className="peer-placeholder-shown:-z-10 peer-focus:z-10 absolute text-[14px] leading-[150%] text-primary peer-focus:text-primary peer-invalid:text-error-500 focus:invalid:text-error-500 duration-300 transform -translate-y-[1.2rem] scale-75 top-2 z-10 origin-[0] bg-white disabled:bg-gray-50-background- px-2 peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-[1.2rem] rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">
                 Description
             </label>
             </div>
-            
-        </div>
-        <div className="sm:flex sm:flex-row-reverse flex gap-4">
-            <button className="w-fit rounded-lg text-sm px-5 py-2 focus:outline-none h-[50px] border bg-violet-500 hover:bg-violet-600 focus:bg-violet-700 border-violet-500-violet- text-white focus:ring-4 focus:ring-violet-200 hover:ring-4 hover:ring-violet-100 transition-all duration-300" type="submit">
+            {submitError && (
+                <p className="col-span-2 rounded-md bg-red-50 p-3 text-sm text-red-600">{submitError}</p>
+            )}
+
+            <div className="sm:flex sm:flex-row-reverse flex gap-4 col-span-2">
+            <button className="w-fit rounded-lg text-sm px-5 py-2 focus:outline-none h-[50px] border bg-violet-500 hover:bg-violet-600 focus:bg-violet-700 border-violet-500-violet- text-white focus:ring-4 focus:ring-violet-200 hover:ring-4 hover:ring-violet-100 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed" type="submit" disabled={isSubmitting}>
             <div className="flex gap-2 items-center">Save changes</div>
             </button>
-            
-        </div>
+
+            <button
+                className="w-fit rounded-lg text-sm px-5 py-2 focus:outline-none h-[50px] border bg-transparent border-primary text-primary focus:ring-4 focus:ring-gray-100"
+                type="button"
+                onClick={onCancel}
+            >
+                Cancel
+            </button>
+            </div>
+        </form>
         </div>
     );
 }

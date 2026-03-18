@@ -8,22 +8,27 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    useEffect(() => {
-        const fetchTasks = async () => {
-            try {
-                setLoading(true);
-                setError("");
-                const response = await axios.get("http://127.0.0.1:8000/api/todo/");
-                setData(response.data);
-            } catch (fetchError) {
-                setError("Unable to load tasks right now. Please try again.");
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchTasks = async () => {
+        try {
+            setLoading(true);
+            setError("");
+            const response = await axios.get("http://127.0.0.1:8000/api/todo/");
+            setData(response.data);
+        } catch (fetchError) {
+            setError("Unable to load tasks right now. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchTasks();
     }, []);
+
+    const handleTaskCreated = async () => {
+        setShowForm(false);
+        await fetchTasks();
+    };
 
     const formatDueDate = (dueDate) => {
         if (!dueDate) {
@@ -58,7 +63,7 @@ const Home = () => {
 
                 {showForm && (
                     <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
-                        <CustomForm />
+                        <CustomForm onSuccess={handleTaskCreated} onCancel={() => setShowForm(false)} />
                     </section>
                 )}
 
