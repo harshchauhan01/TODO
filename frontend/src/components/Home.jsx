@@ -75,7 +75,7 @@ const Home = () => {
                         </div>
                         <button
                             onClick={() => setShowForm((prev) => !prev)}
-                            className="h-11 rounded-lg bg-slate-900 px-5 text-sm font-medium text-white transition hover:bg-slate-800"
+                            className="cursor-pointer h-11 rounded-lg bg-slate-900 px-5 text-sm font-medium text-white transition hover:bg-slate-800"
                         >
                             {showForm ? "Hide Form" : "Add Task"}
                         </button>
