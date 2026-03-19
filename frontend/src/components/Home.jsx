@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import CustomForm from "./Form";
 import axios from "axios";
 import { MdDelete } from "react-icons/md";
-
+import toast from "react-hot-toast";
 
 const Home = () => {
     const [data, setData] = useState([]);
@@ -37,6 +37,7 @@ const Home = () => {
 
     const handleTaskCreated = async () => {
         setShowForm(false);
+        toast.success("Task created successfully.")
         await fetchTasks();
     };
 
@@ -58,15 +59,21 @@ const Home = () => {
             const url=`http://127.0.0.1:8000/api/todo/${i}/`;
             await axios.delete(url);
             await fetchTasks();
+            toast.success("Task deleted successfully.")
         }catch(error){
-            console.log(error);
+            toast.error(error);
         }
     };
 
-    const handleTaskCompleted=async(id)=>{
+    const handleTaskCompleted=async(id,comp)=>{
         try{
             await axios.post(`http://127.0.0.1:8000/api/todo/${id}/mark_complete/`);
             await fetchTasks();
+            if(comp==true){
+                toast.success("Marked Pending");
+            }else{
+                toast.success("Marked Completed");
+            }
         }catch(error){
             console.log(error);
         }
@@ -143,7 +150,7 @@ const Home = () => {
                                         <span className="rounded-md bg-white px-2 py-1 border border-slate-200">
                                             Due: {formatDueDate(task.due_date)}
                                         </span>
-                                        <input type="checkbox" checked={task.completed} onChange={()=>handleTaskCompleted(task.id)}/>
+                                        <input type="checkbox" checked={task.completed} onChange={()=>handleTaskCompleted(task.id,task.completed)}/>
                                         <button onClick={()=>handleDelete(task.id)} className="cursor-pointer text-red-500 hover:text-red-700 transition">
                                             <MdDelete size={20} />
                                         </button>
