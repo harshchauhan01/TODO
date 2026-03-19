@@ -10,6 +10,14 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+    const sortedData=[...data].sort((a,b)=>{
+        const priorityDiff=a.priority-b.priority;
+        if(priorityDiff!==0)return priorityDiff;
+        const dateA = new Date(a.due_date || "9999-12-31");
+        const dateB = new Date(b.due_date || "9999-12-31");
+        return dateA-dateB;
+    });
+
     const fetchTasks = async () => {
         try {
             setLoading(true);
@@ -107,7 +115,7 @@ const Home = () => {
 
                     {!loading && !error && data.length > 0 && (
                         <ul className="space-y-3">
-                            {data.map((task) => (
+                            {sortedData.map((task) => (
                                 <li
                                     key={task.id}
                                     className="rounded-xl border border-slate-200 bg-slate-50 p-4 transition hover:border-slate-300"
@@ -135,7 +143,7 @@ const Home = () => {
                                         <span className="rounded-md bg-white px-2 py-1 border border-slate-200">
                                             Due: {formatDueDate(task.due_date)}
                                         </span>
-                                        <input type="checkbox" onChange={()=>handleTaskCompleted(task.id)}/>
+                                        <input type="checkbox" checked={task.completed} onChange={()=>handleTaskCompleted(task.id)}/>
                                         <button onClick={()=>handleDelete(task.id)} className="cursor-pointer text-red-500 hover:text-red-700 transition">
                                             <MdDelete size={20} />
                                         </button>

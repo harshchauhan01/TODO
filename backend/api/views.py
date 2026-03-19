@@ -24,7 +24,7 @@ def users(request):
 
 
 class TodoViewSet(ModelViewSet):
-    queryset=Task.objects.all()
+    queryset=Task.objects.all().order_by('priority','due_date')
     serializer_class=TodoSerializer
     filter_backends=[filters.SearchFilter]
     search_fields=['title']
@@ -32,6 +32,6 @@ class TodoViewSet(ModelViewSet):
     @action(detail=True,methods=["post"])
     def mark_complete(self,request,pk=None):
         todo=self.get_object()
-        todo.completed=True
+        todo.completed=not todo.completed
         todo.save()
         return Response({"status":"completed"})
