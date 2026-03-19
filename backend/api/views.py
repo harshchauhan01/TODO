@@ -32,6 +32,6 @@ class TodoViewSet(ModelViewSet):
     @action(detail=True,methods=["post"])
     def mark_complete(self,request,pk=None):
         todo=self.get_object()
-        todo.completed=True()
+        todo.completed=True
         todo.save()
         return Response({"status":"completed"})

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import CustomForm from "./Form";
 import axios from "axios";
+import { MdDelete } from "react-icons/md";
+
 
 const Home = () => {
     const [data, setData] = useState([]);
@@ -41,6 +43,25 @@ const Home = () => {
         }
 
         return parsedDate.toLocaleDateString();
+    };
+
+    const handleDelete=async (i)=>{
+        try{
+            const url=`http://127.0.0.1:8000/api/todo/${i}/`;
+            await axios.delete(url);
+            await fetchTasks();
+        }catch(error){
+            console.log(error);
+        }
+    };
+
+    const handleTaskCompleted=async(id)=>{
+        try{
+            await axios.post(`http://127.0.0.1:8000/api/todo/${id}/mark_complete/`);
+            await fetchTasks();
+        }catch(error){
+            console.log(error);
+        }
     };
 
     return (
@@ -105,6 +126,7 @@ const Home = () => {
                                         >
                                             {task.completed ? "Completed" : "Pending"}
                                         </span>
+                                        
                                     </div>
                                     <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-600">
                                         <span className="rounded-md bg-white px-2 py-1 border border-slate-200">
@@ -113,6 +135,10 @@ const Home = () => {
                                         <span className="rounded-md bg-white px-2 py-1 border border-slate-200">
                                             Due: {formatDueDate(task.due_date)}
                                         </span>
+                                        <input type="checkbox" onChange={()=>handleTaskCompleted(task.id)}/>
+                                        <button onClick={()=>handleDelete(task.id)} className="cursor-pointer text-red-500 hover:text-red-700 transition">
+                                            <MdDelete size={20} />
+                                        </button>
                                     </div>
                                 </li>
                             ))}
