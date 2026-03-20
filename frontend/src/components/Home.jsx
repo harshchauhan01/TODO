@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import CustomForm from "./Form";
 import axios from "axios";
-import { MdDelete } from "react-icons/md";
+import { MdDelete,MdChevronLeft, MdChevronRight } from "react-icons/md";
 import toast from "react-hot-toast";
 
 const Home = () => {
@@ -9,14 +9,25 @@ const Home = () => {
     const [showForm, setShowForm] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-
+    const [currPage,setcurrPage]=useState(1);
     const sortedData=[...data].sort((a,b)=>{
+
+        if(a.completed!==b.completed){
+            return a.completed ? 1:-1;
+        }
+
         const priorityDiff=a.priority-b.priority;
         if(priorityDiff!==0)return priorityDiff;
         const dateA = new Date(a.due_date || "9999-12-31");
         const dateB = new Date(b.due_date || "9999-12-31");
         return dateA-dateB;
     });
+
+    const itemsPerPage=5;
+    const startIndex=(currPage-1)*itemsPerPage;
+    const currData=data.slice(startIndex,startIndex+itemsPerPage);
+    const totalPages=data.length===0?0:Math.ceil(data.length/itemsPerPage);
+    
 
     const fetchTasks = async () => {
         try {
@@ -106,15 +117,41 @@ const Home = () => {
                 <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
                     <div className="mb-5 flex items-center justify-between">
                         <h2 className="text-xl font-semibold text-slate-900">Your Tasks</h2>
-                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
-                            {data.length} {data.length === 1 ? "task" : "tasks"}
-                        </span>
+                        <div className="flex items-center gap-3 mt-4">
+                            <button
+                                disabled={currPage === 1}
+                                onClick={() => setcurrPage(currPage - 1)}
+                                className={`flex items-center justify-center w-9 h-9 rounded-lg border
+                                ${currPage === 1 
+                                    ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
+                                    : "bg-white text-gray-700 hover:bg-gray-100 border-gray-300"}
+                                `}
+                            >
+                                <MdChevronLeft size={20} />
+                            </button>
+
+                            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                                {currData.length} {currData.length === 1 ? "task" : "tasks"}
+                            </span>
+
+                            <button
+                                disabled={currPage === totalPages}
+                                onClick={() => setcurrPage(currPage + 1)}
+                                className={`flex items-center justify-center w-9 h-9 rounded-lg border
+                                ${currPage === totalPages 
+                                    ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
+                                    : "bg-white text-gray-700 hover:bg-gray-100 border-gray-300"}
+                                `}
+                            >
+                                <MdChevronRight size={20} />
+                            </button>
+                        </div>
                     </div>
 
                     {loading && <p className="text-sm text-slate-500">Loading tasks...</p>}
                     {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</p>}
 
-                    {!loading && !error && data.length === 0 && (
+                    {!loading && !error && currData.length === 0 && (
                         <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">
                             No tasks yet. Use Add Task to create your first one.
                         </div>
@@ -122,7 +159,7 @@ const Home = () => {
 
                     {!loading && !error && data.length > 0 && (
                         <ul className="space-y-3">
-                            {sortedData.map((task) => (
+                            {currData.map((task) => (
                                 <li
                                     key={task.id}
                                     className="rounded-xl border border-slate-200 bg-slate-50 p-4 transition hover:border-slate-300"
