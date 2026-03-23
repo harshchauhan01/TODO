@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Home from './components/Home';
 import {Toaster} from "react-hot-toast";
 import Navbar from './components/Navbar';
+import {Routes,Route} from "react-router-dom";
+import Todo from './components/Todo';
 
 function App() {
 
@@ -9,7 +11,10 @@ function App() {
     <>
       <Navbar/>
       <Toaster position='top-right'/>
-      <Home/>
+      <Routes>
+        <Route path="" element={<Home/>}/>
+        <Route path="/todo" element={<Todo/>}/>
+      </Routes>
     </>
   );
 }
