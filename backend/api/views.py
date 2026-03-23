@@ -8,6 +8,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticated
+
+
 
 @api_view(['Get'])
 def home(request):
@@ -24,6 +27,7 @@ def users(request):
 
 
 class TodoViewSet(ModelViewSet):
+    permission_classes=[IsAuthenticated]
     queryset=Task.objects.all().order_by('priority','due_date')
     serializer_class=TodoSerializer
     filter_backends=[filters.SearchFilter]
