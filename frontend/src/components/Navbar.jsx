@@ -34,7 +34,7 @@ const Navbar = () => {
                 >
                   ✕
                 </button>
-                <LoginPage/>
+                <LoginPage onAuthSuccess={()=>setOpenModel(false)}/>
               </div>
             </div>
 

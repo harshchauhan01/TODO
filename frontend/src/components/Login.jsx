@@ -3,9 +3,12 @@ import styled from 'styled-components';
 import { useState } from 'react';
 import {useAuth} from "../hooks/useAuth";
 import toast from "react-hot-toast";
+import {useNavigate} from "react-router-dom";
 
-const LoginForm = ({onSwitch}) => {
+
+const LoginForm = ({onSwitch, onAuthSuccess}) => {
   const {login} = useAuth();
+  const navigate = useNavigate();
   const [form, setForm]=useState({
     username:"",
     password:"",
@@ -14,6 +17,8 @@ const LoginForm = ({onSwitch}) => {
     e.preventDefault();
     await login(form);
     toast.success("Login Successfull");
+    onAuthSuccess?.();
+    navigate("/todo");
   };
 
 
@@ -69,7 +74,7 @@ const LoginForm = ({onSwitch}) => {
   );
 };
 
-const RegisterForm = ({onSwitch}) => {
+const RegisterForm = ({onSwitch, onAuthSuccess}) => {
   const {register} = useAuth();
   const [form, setForm]=useState({
     username:"",
@@ -80,6 +85,8 @@ const RegisterForm = ({onSwitch}) => {
     e.preventDefault();
     await register(form);
     toast.success("Register Successfull");
+    onAuthSuccess?.();
+    navigate("/todo");
   };
 
 
@@ -142,12 +149,12 @@ const RegisterForm = ({onSwitch}) => {
 
 
 
-const LoginPage=()=>{
+const LoginPage=({onAuthSuccess})=>{
   const [mode, setMode] = useState(true);
   return mode ? (
-      <LoginForm onSwitch={() => setMode(false)} /> 
+      <LoginForm onSwitch={() => setMode(false) } onAuthSuccess={onAuthSuccess}/> 
     ): (
-      <RegisterForm onSwitch={() => setMode(true)} /> 
+      <RegisterForm onSwitch={() => setMode(true)} onAuthSuccess={onAuthSuccess}/> 
   );
 };
 export default LoginPage;
