@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from "../api/axios";
 import React, { useState } from 'react';
 
 const CustomForm = ({ onSuccess, onCancel }) => {
@@ -37,7 +37,7 @@ const CustomForm = ({ onSuccess, onCancel }) => {
                     : null,
             };
 
-            await axios.post("http://127.0.0.1:8000/api/todo/",payload);
+            await api.post("/api/todo/",payload);
 
             setFormData({
                 title: "",

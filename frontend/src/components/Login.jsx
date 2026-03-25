@@ -15,10 +15,14 @@ const LoginForm = ({onSwitch, onAuthSuccess}) => {
   });
   const handleSubmit=async (e)=>{
     e.preventDefault();
-    await login(form);
-    toast.success("Login Successfull");
-    onAuthSuccess?.();
-    navigate("/todo");
+    try{
+      await login(form);
+      toast.success("Login Successfull");
+      onAuthSuccess?.();
+      navigate("/todo");
+    }catch(error){
+      toast.error("Login failed. Check for username or password");
+    }
   };
 
 
@@ -76,6 +80,7 @@ const LoginForm = ({onSwitch, onAuthSuccess}) => {
 
 const RegisterForm = ({onSwitch, onAuthSuccess}) => {
   const {register} = useAuth();
+  const navigate = useNavigate();
   const [form, setForm]=useState({
     username:"",
     email:"",
@@ -83,10 +88,14 @@ const RegisterForm = ({onSwitch, onAuthSuccess}) => {
   });
   const handleSubmit=async (e)=>{
     e.preventDefault();
-    await register(form);
-    toast.success("Register Successfull");
-    onAuthSuccess?.();
-    navigate("/todo");
+    try{
+      await register(form);
+      toast.success("Register Successfull");
+      onAuthSuccess?.();
+      navigate("/todo");
+    }catch (error){
+      toast.error("Register failed. Try with a different username or password");
+    }
   };
 
 

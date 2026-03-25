@@ -4,6 +4,7 @@ import {Toaster} from "react-hot-toast";
 import Navbar from './components/Navbar';
 import {Routes,Route} from "react-router-dom";
 import Todo from './components/Todo';
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
 
@@ -13,7 +14,11 @@ function App() {
       <Toaster position='top-right'/>
       <Routes>
         <Route path="" element={<Home/>}/>
-        <Route path="/todo" element={<Todo/>}/>
+        <Route path="/todo" element={
+          <PrivateRoute>
+            <Todo/>
+          </PrivateRoute>
+        }/>
       </Routes>
     </>
   );

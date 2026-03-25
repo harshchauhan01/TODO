@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import CustomForm from "./Form";
-import axios from "axios";
+import api from "../api/axios";
 import { MdDelete,MdChevronLeft, MdChevronRight } from "react-icons/md";
 import toast from "react-hot-toast";
 
@@ -33,7 +33,7 @@ const Todo = () => {
         try {
             setLoading(true);
             setError("");
-            const response = await axios.get("http://127.0.0.1:8000/api/todo/");
+            const response = await api.get("/api/todo/");
             setData(response.data);
         } catch (fetchError) {
             setError("Unable to load tasks right now. Please try again.");
@@ -67,8 +67,8 @@ const Todo = () => {
 
     const handleDelete=async (i)=>{
         try{
-            const url=`http://127.0.0.1:8000/api/todo/${i}/`;
-            await axios.delete(url);
+            const url=`/api/todo/${i}/`;
+            await api.delete(url);
             await fetchTasks();
             toast.success("Task deleted successfully.")
         }catch(error){
@@ -78,7 +78,7 @@ const Todo = () => {
 
     const handleTaskCompleted=async(id,comp)=>{
         try{
-            await axios.post(`http://127.0.0.1:8000/api/todo/${id}/mark_complete/`);
+            await api.post(`/api/todo/${id}/mark_complete/`);
             await fetchTasks();
             if(comp==true){
                 toast.success("Marked Pending");

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MdMenu, MdClose } from "react-icons/md";
 import LoginPage from "./Login";
-
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -15,9 +15,9 @@ const Navbar = () => {
         <h1 className="text-xl font-bold text-gray-800">Todo</h1>
         
         <div className="hidden md:flex gap-6 text-gray-600 font-medium">
-          <a href="#" className="hover:text-blue-500">Home</a>
-          <a href="/todo" className="hover:text-blue-500">Tasks</a>
-          <a href="#" className="hover:text-blue-500">About</a>
+          <Link to="/" className="hover:text-blue-500">Home</Link>
+          <Link to="/todo" className="hover:text-blue-500">Tasks</Link>
+          <Link to="/" className="hover:text-blue-500">About</Link>
         </div>
 
         <div className="flex items-center gap-3">
@@ -51,10 +51,10 @@ const Navbar = () => {
 
       {open && (
         <div className="mt-4 flex flex-col gap-4 text-gray-600 md:hidden">
-          <a href="#">Home</a>
-          <a href="#">Tasks</a>
-          <a href="#">About</a>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg">
+          <Link to="/">Home</Link>
+          <Link to="/todo">Tasks</Link>
+          <Link to="/">About</Link>
+          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg" onClick={handleLogin}>
             Login
           </button>
         </div>
