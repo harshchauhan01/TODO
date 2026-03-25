@@ -24,10 +24,16 @@ class RegisterView(generics.CreateAPIView):
 
 class TodoViewSet(ModelViewSet):
     permission_classes=[IsAuthenticated]
-    queryset=Task.objects.all().order_by('priority','due_date')
     serializer_class=TodoSerializer
     filter_backends=[filters.SearchFilter]
     search_fields=['title']
+
+    def get_queryset(self):
+        return Task.objects.filter(user=self.request.user).order_by('priority','due_date')
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+        
 
     @action(detail=True,methods=["post"])
     def mark_complete(self,request,pk=None):
