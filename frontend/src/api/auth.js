@@ -1,3 +1,4 @@
+import axios from 'axios';
 import api from './axios';
 
 export const LoginUser=async (username, password)=>{
@@ -9,6 +10,10 @@ export const LoginUser=async (username, password)=>{
     localStorage.setItem("access",access);
     localStorage.setItem("refresh",refresh);
     return res.data;
+};
+
+export const RegisterUser = async (data) =>{
+    await api.post("/api/register/",data);
 };
 
 export const LogoutUser=()=>{

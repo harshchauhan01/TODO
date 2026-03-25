@@ -8,6 +8,6 @@ router.register(r'todo',TodoViewSet)
 
 urlpatterns=[
     path('',home),
-    path('users/',users),
+    path('register/',RegisterView.as_view()),
     path('',include(router.urls)),
 ]   

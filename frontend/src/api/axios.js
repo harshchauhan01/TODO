@@ -12,13 +12,18 @@ api.interceptors.request.use((config)=>{
         config.headers.Authorization=`Bearer ${token}`;
     }
     return config;
-})
+});
 
-api.interceptors.request.use(
+api.interceptors.response.use(
     (response)=>response,
     async (error)=>{
         const originalRequest = error.config;
-        if(error.response?.status===401 && !originalRequest._retry){
+
+        const isUnauthorized = error.response?.status===401;
+        const hasRefreshToken = !!localStorage.getItem("refresh");
+        const isRefreshCall = originalRequest?.url?.includes("/api/token/refresh/");
+
+        if(isUnauthorized && !originalRequest?._retry && hasRefreshToken && !isRefreshCall){
             originalRequest._retry=true;
             try{
                 const refresh=localStorage.getItem('refresh');
@@ -32,7 +37,7 @@ api.interceptors.request.use(
             }catch(err){
                 console.log("Refresh Failed");
                 localStorage.clear();
-                window.location.href="";
+                window.location.href="/";
             }
         }
         return Promise.reject(error);
