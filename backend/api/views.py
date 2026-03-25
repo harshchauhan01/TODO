@@ -3,7 +3,7 @@ from .models import Task
 from .serializers import *
 from django.shortcuts import render
 from django.http import JsonResponse
-from rest_framework import filters
+from rest_framework import filters, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -16,14 +16,10 @@ from rest_framework.permissions import IsAuthenticated
 def home(request):
     return Response("Hello This is home page.")
 
-@api_view(['Get'])
-def users(request):
-    data = [
-        {"id":1,"name":"Rahul"},
-        {"id":2,"name":"Aman"},
-        {"id":3,"name":"John"}
-    ]
-    return Response(data)
+
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class=RegisterSerializer
 
 
 class TodoViewSet(ModelViewSet):
@@ -39,3 +35,4 @@ class TodoViewSet(ModelViewSet):
         todo.completed=not todo.completed
         todo.save()
         return Response({"status":"completed"})
+
