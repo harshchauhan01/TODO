@@ -35,12 +35,27 @@ const Todo = () => {
             setError("");
             const response = await api.get("/api/todo/");
             setData(response.data);
+            console.log(response.data);
+            
         } catch (fetchError) {
             setError("Unable to load tasks right now. Please try again.");
         } finally {
             setLoading(false);
         }
     };
+    const [user, setUser] = useState(null);
+    
+    useEffect(()=>{
+        const fetchUser = async () =>{
+            try{
+                const res = await api.get("/api/me/");
+                setUser(res.data);
+            }catch(error){
+                console.log(error);
+            }
+        };
+        fetchUser();
+    },[]);
 
     useEffect(() => {
         fetchTasks();
@@ -89,11 +104,15 @@ const Todo = () => {
             console.log(error);
         }
     };
+    
+    
 
     return (
         <main className="min-h-screen bg-gradient-to-br from-slate-100 via-slate-50 to-blue-50 px-4 py-8 sm:px-6">
             <div className="mx-auto w-full max-w-5xl space-y-6">
                 <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                    <h1 className="text-5xl pd-5 font-semibold tracking-tight text-slate-900">Hi {user?.username?.charAt(0).toUpperCase()+user?.username?.slice(1)}</h1>
+                    
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Task Manager</h1>

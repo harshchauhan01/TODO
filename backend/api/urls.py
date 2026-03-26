@@ -10,4 +10,5 @@ urlpatterns=[
     path('',home),
     path('register/',RegisterView.as_view()),
     path('',include(router.urls)),
+    path('me/',CurrentUserView.as_view())
 ]   

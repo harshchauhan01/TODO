@@ -2,6 +2,9 @@ import { useState } from "react";
 import { MdMenu, MdClose } from "react-icons/md";
 import LoginPage from "./Login";
 import { Link } from "react-router-dom";
+import {useAuth} from "../hooks/useAuth";
+import toast from "react-hot-toast";
+
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -9,6 +12,18 @@ const Navbar = () => {
   const handleLogin=()=>{
     setOpenModel(true);
   };
+
+  const {logout} = useAuth();
+
+  const handleLogout=()=>{
+    logout();
+    toast.success("Logout Successfully");
+  };
+
+
+  const isLoggedIn = !!localStorage.getItem("access");
+
+
   return (
     <nav className="bg-white shadow-md px-6 py-3">
       <div className="flex items-center justify-between">
@@ -21,9 +36,14 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-3">
+          { isLoggedIn ? 
+          <button className="hidden md:block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600" onClick={handleLogout}>
+            Logout
+          </button> :
           <button className="hidden md:block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600" onClick={handleLogin}>
             Login
-          </button>
+          </button> 
+          }
 
           {openModel && (
             <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50" onClick={()=>setOpenModel(false)}>
@@ -54,9 +74,15 @@ const Navbar = () => {
           <Link to="/">Home</Link>
           <Link to="/todo">Tasks</Link>
           <Link to="/">About</Link>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg" onClick={handleLogin}>
+          {
+            isLoggedIn ?
+            <button className="bg-red-500 text-white px-4 py-2 rounded-lg" onClick={handleLogout}>
+            Logout
+            </button> :
+            <button className="bg-blue-500 text-white px-4 py-2 rounded-lg" onClick={handleLogin}>
             Login
-          </button>
+            </button>
+          }
         </div>
       )}
     </nav>
