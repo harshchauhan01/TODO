@@ -33,6 +33,7 @@ const Navbar = () => {
           <Link to="/" className="hover:text-blue-500">Home</Link>
           <Link to="/todo" className="hover:text-blue-500">Tasks</Link>
           <Link to="/" className="hover:text-blue-500">About</Link>
+          <Link to="/clock" className="hover:text-blue-500">Clock</Link>
         </div>
 
         <div className="flex items-center gap-3">
