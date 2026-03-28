@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import Home from './components/Home';
 import {Toaster} from "react-hot-toast";
 import Navbar from './components/Navbar';
@@ -10,7 +9,7 @@ import ClockPage from './components/ClockPage';
 function App() {
 
   return(
-    <>
+    <div className="app-shell">
       <Navbar/>
       <Toaster position='top-right'/>
       <Routes>
@@ -23,7 +22,7 @@ function App() {
         }/>
         
       </Routes>
-    </>
+    </div>
   );
 }
 

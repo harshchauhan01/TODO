@@ -373,8 +373,8 @@ const StopWatch = () => {
             <defs>
               <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#6366f1" />
-                <stop offset="50%" stopColor="#8b5cf6" />
-                <stop offset="100%" stopColor="#ec4899" />
+                <stop offset="50%" stopColor="#0f766e" />
+                <stop offset="100%" stopColor="#f59e0b" />
               </linearGradient>
             </defs>
           </svg>
@@ -513,17 +513,12 @@ const ClockPage = () => {
   const [activeTab, setActiveTab] = useState("clock");
 
   return (
-    <div
-      className="min-h-screen py-12 px-4"
-      style={{
-        background: "linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%)",
-      }}
-    >
+    <div className="page-wrap min-h-screen py-10 sm:py-12">
       {/* Header */}
       <div className="text-center mb-12">
         <h1
-          className="text-4xl md:text-5xl font-light tracking-wider bg-gradient-to-r from-gray-600 via-gray-500 to-gray-600 bg-clip-text text-transparent"
-          style={{ fontFamily: "system-ui" }}
+          className="text-4xl md:text-5xl font-medium tracking-wide bg-gradient-to-r from-slate-700 via-slate-500 to-slate-700 bg-clip-text text-transparent"
+          style={{ fontFamily: "Sora, sans-serif" }}
         >
           CHRONOGRAPH
         </h1>
@@ -586,7 +581,7 @@ const ClockPage = () => {
       </div>
 
       {/* Footer */}
-      <div className="text-center mt-16 text-gray-400 text-sm">
+      <div className="text-center mt-16 text-gray-500 text-sm">
         <p className="tracking-wider">PRECISION TIMEKEEPING</p>
       </div>
     </div>

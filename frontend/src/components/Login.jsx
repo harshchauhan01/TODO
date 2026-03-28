@@ -178,13 +178,14 @@ const StyledWrapper = styled.div`
     gap: 10px;
     background-color: #ffffff;
     padding: 30px;
-    width: 450px;
+    width: 100%;
+    max-width: 450px;
     border-radius: 20px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: "Manrope", "Segoe UI", sans-serif;
   }
 
   ::placeholder {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: "Manrope", "Segoe UI", sans-serif;
   }
 
   .form button {

@@ -25,8 +25,8 @@ const Todo = () => {
 
     const itemsPerPage=5;
     const startIndex=(currPage-1)*itemsPerPage;
-    const currData=data.slice(startIndex,startIndex+itemsPerPage);
-    const totalPages=data.length===0?0:Math.ceil(data.length/itemsPerPage);
+    const currData=sortedData.slice(startIndex,startIndex+itemsPerPage);
+    const totalPages=sortedData.length===0?0:Math.ceil(sortedData.length/itemsPerPage);
     
 
     const fetchTasks = async () => {
@@ -108,19 +108,26 @@ const Todo = () => {
     
 
     return (
-        <main className="min-h-screen bg-gradient-to-br from-slate-100 via-slate-50 to-blue-50 px-4 py-8 sm:px-6">
-            <div className="mx-auto w-full max-w-5xl space-y-6">
-                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-                    <h1 className="text-5xl pd-5 font-semibold tracking-tight text-slate-900">Hi {user?.username?.charAt(0).toUpperCase()+user?.username?.slice(1)}</h1>
-                    
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <main className="page-wrap min-h-screen pb-14 pt-4 sm:pt-6">
+            <div className="space-y-6">
+                <section className="glass-panel rise-in rounded-3xl px-6 py-7 sm:px-8 sm:py-9">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <div>
-                            <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Task Manager</h1>
-                            <p className="mt-2 text-sm text-slate-600">Track your tasks and stay focused on what matters most.</p>
+                            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                                Welcome back
+                            </p>
+                            <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+                                {user?.username
+                                    ? `Hi ${user.username.charAt(0).toUpperCase()}${user.username.slice(1)}`
+                                    : "Your Task Manager"}
+                            </h1>
+                            <p className="mt-3 max-w-2xl text-sm text-slate-600 sm:text-base">
+                                Keep momentum high. Plan priority work, set deadlines, and close items fast.
+                            </p>
                         </div>
                         <button
                             onClick={() => setShowForm((prev) => !prev)}
-                            className="cursor-pointer h-11 rounded-lg bg-slate-900 px-5 text-sm font-medium text-white transition hover:bg-slate-800"
+                            className="h-11 rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-700"
                         >
                             {showForm ? "Hide Form" : "Add Task"}
                         </button>
@@ -128,39 +135,39 @@ const Todo = () => {
                 </section>
 
                 {showForm && (
-                    <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+                    <section className="rise-in">
                         <CustomForm onSuccess={handleTaskCreated} onCancel={() => setShowForm(false)} />
                     </section>
                 )}
 
-                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-                    <div className="mb-5 flex items-center justify-between">
-                        <h2 className="text-xl font-semibold text-slate-900">Your Tasks</h2>
-                        <div className="flex items-center gap-3 mt-4">
+                <section className="glass-panel rounded-3xl px-6 py-7 sm:px-8 sm:py-9">
+                    <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+                        <h2 className="text-2xl font-bold text-slate-900">Your Tasks</h2>
+                        <div className="flex items-center gap-3">
                             <button
                                 disabled={currPage === 1}
                                 onClick={() => setcurrPage(currPage - 1)}
-                                className={`flex items-center justify-center w-9 h-9 rounded-lg border
-                                ${currPage === 1 
-                                    ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
-                                    : "bg-white text-gray-700 hover:bg-gray-100 border-gray-300"}
-                                `}
+                                className={`flex h-10 w-10 items-center justify-center rounded-xl border transition ${
+                                    currPage === 1
+                                        ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-300"
+                                        : "border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                                }`}
                             >
                                 <MdChevronLeft size={20} />
                             </button>
 
-                            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                            <span className="rounded-full border border-slate-200 bg-white/90 px-3 py-1 text-xs font-semibold text-slate-700">
                                 {currData.length} {currData.length === 1 ? "task" : "tasks"}
                             </span>
 
                             <button
-                                disabled={currPage === totalPages}
+                                disabled={currPage === totalPages || totalPages === 0}
                                 onClick={() => setcurrPage(currPage + 1)}
-                                className={`flex items-center justify-center w-9 h-9 rounded-lg border
-                                ${currPage === totalPages 
-                                    ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
-                                    : "bg-white text-gray-700 hover:bg-gray-100 border-gray-300"}
-                                `}
+                                className={`flex h-10 w-10 items-center justify-center rounded-xl border transition ${
+                                    currPage === totalPages || totalPages === 0
+                                        ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-300"
+                                        : "border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                                }`}
                             >
                                 <MdChevronRight size={20} />
                             </button>
@@ -168,47 +175,59 @@ const Todo = () => {
                     </div>
 
                     {loading && <p className="text-sm text-slate-500">Loading tasks...</p>}
-                    {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</p>}
+                    {error && <p className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">{error}</p>}
 
                     {!loading && !error && currData.length === 0 && (
-                        <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">
+                        <div className="rounded-xl border border-dashed border-slate-300 bg-white/70 p-6 text-sm text-slate-600">
                             No tasks yet. Use Add Task to create your first one.
                         </div>
                     )}
 
-                    {!loading && !error && data.length > 0 && (
+                    {!loading && !error && sortedData.length > 0 && (
                         <ul className="space-y-3">
                             {currData.map((task) => (
                                 <li
                                     key={task.id}
-                                    className="rounded-xl border border-slate-200 bg-slate-50 p-4 transition hover:border-slate-300"
+                                    className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                                 >
                                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                         <div>
-                                            <h3 className="text-base font-semibold text-slate-900">{task.title}</h3>
-                                            <p className="mt-1 text-sm text-slate-600">
+                                            <h3 className="text-lg font-semibold text-slate-900">{task.title}</h3>
+                                            <p className="mt-1 text-sm leading-relaxed text-slate-600">
                                                 {task.content || "No description provided."}
                                             </p>
                                         </div>
                                         <span
-                                            className={`w-fit rounded-full px-3 py-1 text-xs font-medium ${task.completed
+                                            className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${task.completed
                                                 ? "bg-emerald-100 text-emerald-700"
                                                 : "bg-amber-100 text-amber-700"}`}
                                         >
                                             {task.completed ? "Completed" : "Pending"}
                                         </span>
-                                        
                                     </div>
-                                    <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-600">
-                                        <span className="rounded-md bg-white px-2 py-1 border border-slate-200">
+
+                                    <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-600">
+                                        <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-1">
                                             Priority: {task.priority}
                                         </span>
-                                        <span className="rounded-md bg-white px-2 py-1 border border-slate-200">
+                                        <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-1">
                                             Due: {formatDueDate(task.due_date)}
                                         </span>
-                                        <input type="checkbox" checked={task.completed} onChange={()=>handleTaskCompleted(task.id,task.completed)}/>
-                                        <button onClick={()=>handleDelete(task.id)} className="cursor-pointer text-red-500 hover:text-red-700 transition">
-                                            <MdDelete size={20} />
+                                        <label className="ml-auto inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-2 py-1">
+                                            <input
+                                                type="checkbox"
+                                                checked={task.completed}
+                                                onChange={()=>handleTaskCompleted(task.id,task.completed)}
+                                                className="h-4 w-4 rounded border-slate-300 text-slate-900"
+                                            />
+                                            Toggle
+                                        </label>
+                                        <button
+                                            onClick={()=>handleDelete(task.id)}
+                                            className="rounded-md border border-rose-200 bg-rose-50 p-1.5 text-rose-600 transition hover:bg-rose-100"
+                                            aria-label="Delete task"
+                                        >
+                                            <MdDelete size={18} />
                                         </button>
                                     </div>
                                 </li>
