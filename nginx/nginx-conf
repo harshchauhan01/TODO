@@ -1,0 +1,11 @@
+server {
+    listen 80;
+
+    location / {
+        proxy_pass http://react_frontend:80;
+    }
+
+    location /api/ {
+        proxy_pass http://django_backend:8000;
+    }
+}
