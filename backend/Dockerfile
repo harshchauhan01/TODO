@@ -1,22 +1,42 @@
-FROM python:3.11-alpine
+FROM python:3.11-alpine AS builder
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
 WORKDIR /app
 
-RUN apk add --no-cache build-base libffi-dev postgresql-dev jpeg-dev zlib-dev
+RUN apk add --no-cache --virtual .build-deps \
+    build-base \
+    libffi-dev \
+    postgresql-dev \
+    jpeg-dev \
+    zlib-dev
 
-copy requirements.txt .
+COPY requirements.txt .
 
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir gunicorn whitenoise
+    pip install --prefix=/install -r requirements.txt && \
+    pip install --prefix=/install gunicorn whitenoise
 
-COPY . . 
+FROM python:3.11-alpine AS runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+RUN apk add --no-cache \
+    libpq \
+    libffi \
+    libjpeg-turbo \
+    zlib
+
+COPY --from=builder /install /usr/local
+COPY . .
 
 RUN python manage.py collectstatic --noinput
-
 
 EXPOSE 8000
 
