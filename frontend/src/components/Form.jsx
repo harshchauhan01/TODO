@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import api from "../api/axios";
+import toast from "react-hot-toast";
+import { useOfflineStatus } from "../hooks/useOffline";
+import { saveTask, addToSyncQueue } from "../utils/db";
 
 const baseInputClass =
   "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm transition focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200";
 
-const CustomForm = ({ onSuccess, onCancel }) => {
+const CustomForm = ({ onSuccess, onCancel, user }) => {
   const [formData, setFormData] = useState({
     title: "",
     priority: "",
@@ -14,6 +17,7 @@ const CustomForm = ({ onSuccess, onCancel }) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const isOnline = useOfflineStatus();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -39,7 +43,25 @@ const CustomForm = ({ onSuccess, onCancel }) => {
           : null,
       };
 
-      await api.post("/api/todo/", payload);
+      if (!isOnline) {
+        // Save offline with user ID
+        const tempId = `temp_${Date.now()}`;
+        const offlineTask = { 
+          ...payload, 
+          id: tempId, 
+          user: user?.id,
+          synced: false,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        await saveTask(offlineTask);
+        await addToSyncQueue('create', payload);
+        toast.success("Task saved offline (will sync when online)");
+      } else {
+        // Save online
+        await api.post("/api/todo/", payload);
+        toast.success("Task created successfully");
+      }
 
       setFormData({
         title: "",
@@ -72,9 +94,16 @@ const CustomForm = ({ onSuccess, onCancel }) => {
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">New Task</p>
           <h3 className="mt-1 text-2xl font-bold text-slate-900">Create an action item</h3>
         </div>
-        <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-          Fast Entry
-        </span>
+        <div className="flex items-center gap-2">
+          {!isOnline && (
+            <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+              📱 Offline
+            </span>
+          )}
+          <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+            Fast Entry
+          </span>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
