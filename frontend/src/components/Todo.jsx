@@ -115,6 +115,23 @@ const Todo = () => {
     return parsedDate.toLocaleDateString();
   };
 
+  const isTaskExpired = (task) => {
+    if (task.completed || !task.due_date) {
+      return false;
+    }
+
+    if (typeof task.is_expired === "boolean") {
+      return task.is_expired;
+    }
+
+    const dueDate = new Date(task.due_date);
+    if (Number.isNaN(dueDate.getTime())) {
+      return false;
+    }
+
+    return dueDate.getTime() < Date.now();
+  };
+
   const handleDelete = async (id) => {
     try {
       if (!isOnline) {
@@ -254,53 +271,66 @@ const Todo = () => {
 
           {!loading && !error && sortedData.length > 0 && (
             <ul className="space-y-3">
-              {currData.map((task) => (
-                <li
-                  key={task.id}
-                  className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-                >
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900">{task.title}</h3>
-                      <p className="mt-1 text-sm leading-relaxed text-slate-600">
-                        {task.content || "No description provided."}
-                      </p>
-                    </div>
-                    <span
-                      className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${
-                        task.completed ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
-                      }`}
-                    >
-                      {task.completed ? "Completed" : "Pending"}
-                    </span>
-                  </div>
+              {currData.map((task) => {
+                const expired = isTaskExpired(task);
 
-                  <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-600">
-                    <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-1">
-                      Priority: {task.priority}
-                    </span>
-                    <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-1">
-                      Due: {formatDueDate(task.due_date)}
-                    </span>
-                    <label className="ml-auto inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-2 py-1">
-                      <input
-                        type="checkbox"
-                        checked={task.completed}
-                        onChange={() => handleTaskCompleted(task.id, task.completed)}
-                        className="h-4 w-4 rounded border-slate-300 text-slate-900"
-                      />
-                      Toggle
-                    </label>
-                    <button
-                      onClick={() => handleDelete(task.id)}
-                      className="rounded-md border border-rose-200 bg-rose-50 p-1.5 text-rose-600 transition hover:bg-rose-100"
-                      aria-label="Delete task"
-                    >
-                      <MdDelete size={18} />
-                    </button>
-                  </div>
-                </li>
-              ))}
+                return (
+                  <li
+                    key={task.id}
+                    className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                  >
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold text-slate-900">{task.title}</h3>
+                        <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                          {task.content || "No description provided."}
+                        </p>
+                      </div>
+                      <span
+                        className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${
+                          task.completed
+                            ? "bg-emerald-100 text-emerald-700"
+                            : expired
+                              ? "bg-rose-100 text-rose-700"
+                              : "bg-amber-100 text-amber-700"
+                        }`}
+                      >
+                        {task.completed ? "Completed" : expired ? "Expired" : "Pending"}
+                      </span>
+                    </div>
+
+                    <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-600">
+                      <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-1">
+                        Priority: {task.priority}
+                      </span>
+                      <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-1">
+                        Due: {formatDueDate(task.due_date)}
+                      </span>
+                      {expired && (
+                        <span className="rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-rose-700">
+                          Past due date
+                        </span>
+                      )}
+                      <label className="ml-auto inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-2 py-1">
+                        <input
+                          type="checkbox"
+                          checked={task.completed}
+                          onChange={() => handleTaskCompleted(task.id, task.completed)}
+                          className="h-4 w-4 rounded border-slate-300 text-slate-900"
+                        />
+                        Toggle
+                      </label>
+                      <button
+                        onClick={() => handleDelete(task.id)}
+                        className="rounded-md border border-rose-200 bg-rose-50 p-1.5 text-rose-600 transition hover:bg-rose-100"
+                        aria-label="Delete task"
+                      >
+                        <MdDelete size={18} />
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </section>
